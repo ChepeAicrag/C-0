@@ -1,0 +1,74 @@
+package Analizadores;
+
+import java_cupterminal runtimeterminal *;
+import javaterminal ioterminal FileReader;
+import javaterminal ioterminal IOException;
+
+//----> PARSER CODE
+
+parser code {:
+
+:};
+
+//----> ACTION CODE
+ 
+action code {:
+
+:};
+
+//----> TERMINALES
+
+terminal PARENTIZQ
+terminal PARENDER
+terminal PUNTOCOMA
+terminal SUMA
+terminal RESTA
+terminal PRODUCTO
+terminal DIVISION
+terminal MENOR
+terminal MAYOR
+terminal IGUAL
+terminal DISTINTO  
+terminal OR
+terminal AND
+terminal ASIGNAR
+terminal LLAVEIZQ
+terminal LLAVEDER
+terminal INT
+terminal MAIN
+terminal IF
+terminal ELSE
+terminal WHILE
+terminal PUTS
+terminal PUTW
+terminal BREAK
+terminal String CADENATEXTO
+terminal String ID
+terminal String ENTERO
+
+//----> NO TERMINALES
+non terminal Programa, Declaraciones, Cuerpo;
+non terminal BloqueSentencias;
+non terminal Declaracion;
+
+// PRECEDENCIAS
+
+precedence left ASIGNAR;
+precedence left OR, AND;
+precedence left DISTINTO, IGUAL, MAYOR, MENOR;
+precedence left SUMA, RESTA;
+precedence right PRODUCTO, DIVISION;
+precedence right PARENTIZQ, PARENDER;
+
+start with Programa;
+
+//----> REGLAS DE GRAMÁTICA
+
+Programa ::= Declaraciones Cuerpo | Cuerpo;
+
+Declaraciones ::= Declaracion Declaraciones | Declaracion;
+
+Declaracion ::= INT ID PUNTOCOMA;
+
+Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER;
+
