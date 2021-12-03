@@ -1,0 +1,128 @@
+package Analizadores;
+
+import java_cup.runtime.*;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Vector;
+import java_cup.runtime.*;
+import java.util.*;
+import java.io.*;
+
+//----> ACTION CODE
+ 
+action code {:
+
+:};
+
+//-----Parser code
+parser code {:
+:};
+
+//----> TERMINALES
+
+terminal PARENTIZQ;
+terminal PARENDER;
+terminal PUNTOCOMA;
+terminal SUMA;
+terminal RESTA;
+terminal PRODUCTO;
+terminal DIVISION;
+terminal MENOR;
+terminal MAYOR;
+terminal IGUAL;
+terminal DISTINTO;
+terminal OR;
+terminal AND;
+terminal ASIGNAR;
+terminal LLAVEIZQ;
+terminal LLAVEDER;
+terminal INT;
+terminal MAIN;
+terminal IF;
+terminal ELSE;
+terminal WHILE;
+terminal PUTS;
+terminal PUTW;
+terminal BREAK;
+terminal String CADENATEXTO;
+terminal String ENTERO;
+terminal String ID;
+//----> NO TERMINALES 
+non terminal Programa, Declaraciones, Cuerpo;
+non terminal BloqueSentencias;
+non terminal Declaracion;
+non terminal Sentencias, Sentencia;
+non terminal BloqueSentencias;
+non terminal Expresion;
+non terminal Condicion;
+non terminal SentIf, SentElse;
+non terminal SentWhile;
+non terminal SentAsignacion;
+non terminal SentPutw, SentPuts;
+non terminal SentBreak;
+
+//------>PRECEDENCIA
+precedence left ASIGNAR;
+precedence left OR;
+precedence left AND;
+precedence left IGUAL,DISTINTO;
+precedence left MAYOR,MENOR;
+precedence left SUMA,RESTA;
+precedence right PRODUCTO, DIVISION;
+precedence right PARENTIZQ, PARENDER;
+
+start with Programa;
+
+
+//----> REGLAS DE GRAMÁTICA
+Programa ::= Declaraciones Cuerpo | Cuerpo;
+
+Declaraciones ::= Declaracion Declaraciones | Declaracion;
+Declaracion ::= INT ID PUNTOCOMA;
+
+Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER;
+
+//para expresiones
+Expresion ::= Expresion SUMA Expresion |
+Expresion RESTA Expresion |
+Expresion PRODUCTO Expresion |
+Expresion DIVISION Expresion |
+ENTERO |
+ID |
+PARENTIZQ Expresion PARENDER;
+
+//para if y while
+Condicion ::= Expresion OR Expresion |
+Expresion AND Expresion |
+Expresion IGUAL Expresion |
+Expresion DISTINTO Expresion |
+Expresion MAYOR Expresion |
+Expresion MENOR Expresion |
+PARENTIZQ Condicion PARENDER;
+
+
+//Reglas para los bloques
+SentIf ::= IF PARENTIZQ Condicion PARENDER;
+LLAVEIZQ BloqueSentencias LLAVEDER SentElse;
+SentElse ::= ELSE LLAVEIZQ BloqueSentencias LLAVEDER |;
+
+//sentencia while
+SentWhile ::= WHILE PARENTIZQ Condicion PARENDER
+LLAVEIZQ BloqueSentencias LLAVEDER;
+
+//sentencia de asignacion
+SentAsignacion ::= ID ASIGNAR Expresion PUNTOCOMA;
+
+//snetencia para imprimir enteros y cadenas
+SentPutw ::= PUTW PARENTIZQ Expresion PARENDER PUNTOCOMA;
+SentPuts ::= PUTS PARENTIZQ CADENATEXTO PARENDER PUNTOCOMA;
+//Salir del while
+SentBreak ::= BREAK PUNTOCOMA;
+
+Sentencia ::= SentIf |
+SentWhile |
+SentAsignacion |
+SentPutw |
+SentPuts |
+SentBreak;
