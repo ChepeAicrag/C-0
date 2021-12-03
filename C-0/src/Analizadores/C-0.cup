@@ -46,37 +46,81 @@ terminal String CADENATEXTO;
 terminal String ID;
 terminal String ENTERO;
 
-//----> NO TERMINALES
+//----> NO TERMINALES 
 non terminal Programa, Declaraciones, Cuerpo;
 non terminal BloqueSentencias;
 non terminal Declaracion;
 non terminal Sentencias, Sentencia;
+non terminal BloqueSentencias;
+non terminal Expresion;
+non terminal Condicion;
+non terminal SentIf, SentElse;
+non terminal SentWhile;
+non terminal SentAsignacion;
+non terminal SentPutw, SentPuts;
+non terminal SentBreak;
 
-// PRECEDENCIAS
-
+//------>PRECEDENCIA
 precedence left ASIGNAR;
-precedence left OR, AND;
-precedence left DISTINTO, IGUAL, MAYOR, MENOR;
-precedence left SUMA, RESTA;
+precedence left OR;
+precedence left AND;
+precedence left IGUAL,DISTINTO;
+precedence left MAYOR,MENOR;
+precedence left SUMA,RESTA;
 precedence right PRODUCTO, DIVISION;
 precedence right PARENTIZQ, PARENDER;
 
 start with Programa;
 
-//----> REGLAS DE GRAMÁTICA
 
+//----> REGLAS DE GRAMÁTICA
 Programa ::= Declaraciones Cuerpo | Cuerpo;
 
 Declaraciones ::= Declaracion Declaraciones | Declaracion;
-
 Declaracion ::= INT ID PUNTOCOMA;
-
-//----> Probando solo estructural del programa Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER | MAIN PARENTIZQ PARENDER LLAVEIZQ LLAVEDER;
 
 Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER;
 
-//----> Autor para sentencias vacías
- 
-BloqueSentencias ::= Sentencias | ;
+//para expresiones
+Expresion ::= Expresion SUMA Expresion |
+Expresion RESTA Expresion |
+Expresion PRODUCTO Expresion |
+Expresion DIVISION Expresion |
+ENTERO |
+ID |
+PARENTIZQ Expresion PARENDER;
 
-Sentencias ::= Sentencias Sentencia | Sentencia;
+//para if y while
+Condicion ::= Expresion OR Expresion |
+Expresion AND Expresion |
+Expresion IGUAL Expresion |
+Expresion DISTINTO Expresion |
+Expresion MAYOR Expresion |
+Expresion MENOR Expresion |
+PARENTIZQ Condicion PARENDER;
+
+
+//Reglas para los bloques
+SentIf ::= IF PARENTIZQ Condicion PARENDER;
+LLAVEIZQ BloqueSentencias LLAVEDER SentElse;
+SentElse ::= ELSE LLAVEIZQ BloqueSentencias LLAVEDER |;
+
+//sentencia while
+SentWhile ::= WHILE PARENTIZQ Condicion PARENDER
+LLAVEIZQ BloqueSentencias LLAVEDER;
+
+//sentencia de asignacion
+SentAsignacion ::= ID ASIGNAR Expresion PUNTOCOMA;
+
+//snetencia para imprimir enteros y cadenas
+SentPutw ::= PUTW PARENTIZQ Expresion PARENDER PUNTOCOMA;
+SentPuts ::= PUTS PARENTIZQ CADENATEXTO PARENDER PUNTOCOMA;
+//Salir del while
+SentBreak ::= BREAK PUNTOCOMA;
+
+Sentencia ::= SentIf |
+SentWhile |
+SentAsignacion |
+SentPutw |
+SentPuts |
+SentBreak;
