@@ -12,71 +12,237 @@ parser code {:
 
 //----> ACTION CODE
  
+import java_cup.runtime.*;
+import java.util.*;
+import java.io.*;
+
 action code {:
 
-:};
+	Tabla tabla;
+	int cuentaWhiles;
+	int cuentaDirecciones;
+	CodigoIntermedio codigoIntermedio;
+	int cuentaIf;
+	Pila pilaIf;
+	int cuentaBucle;
+	Pila pilaBucle;
+	int cuentaCadenas;
+	Lista listaCadenas;
 
-//----> TERMINALES
+	void inicializar() {
+		tabla = new Tabla();
+		cuentaWhiles = 0;
+		cuentaDirecciones = 9999;
+		cuentaIf = 0;
+		pilaIf = new Pila();
+		cuentaBucle = 0;
+		pilaBucle = new Pila();
+		cuentaCadenas = 0;
+		listaCadenas = new Lista();
+		String nombre = parser.nombreFichero.substring(0,parser.nombreFichero.lastIndexOf("."));
+		codigoIntermedio = new CodigoIntermedio(nombre+".ci");
+		try {
+			codigoIntermedio.abrirFicheroEscritura();
+		} catch (IOException e) {
+			System.out.println(Textos.ficheroCiNoExiste);
+			codigoIntermedio.cerrarFicheroEscritura();
+		}
+	}
 
-terminal PARENTIZQ;
-terminal PARENDER;
-terminal PUNTOCOMA;
-terminal SUMA;
-terminal RESTA;
-terminal PRODUCTO;
-terminal DIVISION;
-terminal MENOR;
-terminal MAYOR;
-terminal IGUAL;
-terminal DISTINTO;
-terminal OR;
-terminal AND;
-terminal ASIGNAR;
-terminal LLAVEIZQ;
-terminal LLAVEDER;
-terminal INT;
-terminal MAIN;
-terminal IF;
-terminal ELSE;
-terminal WHILE;
-terminal PUTS;
-terminal PUTW;
-terminal BREAK;
-terminal String CADENATEXTO;
-terminal String ID;
-terminal String ENTERO;
+	boolean existeSimbolo(String id) {
+		return tabla.existeSimbolo(id);
+	}
 
-//----> NO TERMINALES
-non terminal Programa, Declaraciones, Cuerpo;
-non terminal BloqueSentencias;
-non terminal Declaracion;
-non terminal Sentencias, Sentencia;
+	void addSimbolo(String id) {
+		tabla.addSimbolo(id);
+	}
 
-// PRECEDENCIAS
+	void setDireccionSimbolo(String id,int dir) {
+		tabla.setDireccionSimbolo(id,dir);
+	}
 
-precedence left ASIGNAR;
-precedence left OR, AND;
-precedence left DISTINTO, IGUAL, MAYOR, MENOR;
-precedence left SUMA, RESTA;
-precedence right PRODUCTO, DIVISION;
-precedence right PARENTIZQ, PARENDER;
+	Expresion suma(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("SUMAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-start with Programa;
+	Expresion resta(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("RESTAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-//----> REGLAS DE GRAMÁTICA
+	Expresion producto(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("MULTIPLICAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-Programa ::= Declaraciones Cuerpo | Cuerpo;
+	Expresion division(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("DIVIDIR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-Declaraciones ::= Declaracion Declaraciones | Declaracion;
+	Expresion entero(String e) {
+		cuentaDirecciones++;
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_VALOR",
+								e,
+								null,
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-Declaracion ::= INT ID PUNTOCOMA;
+	Expresion identificador(String id) {
+		cuentaDirecciones++;
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
+								String.valueOf((tabla.getSimbolo(id)).getDireccion()),
+								null,
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-//----> Probando solo estructural del programa Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER | MAIN PARENTIZQ PARENDER LLAVEIZQ LLAVEDER;
+	Expresion or(Expresion c1,Expresion c2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("OR",
+								String.valueOf(c1.getDireccion()),
+								String.valueOf(c2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER;
+	Expresion and(Expresion c1,Expresion c2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("AND",
+								String.valueOf(c1.getDireccion()),
+								String.valueOf(c2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-//----> Autor para sentencias vacías
- 
-BloqueSentencias ::= Sentencias | ;
+	Expresion mayor(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("MAYOR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
 
-Sentencias ::= Sentencias Sentencia | Sentencia;
+	Expresion menor(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("MENOR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion igual(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("IGUAL",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion distinto(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("DISTINTO",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	void asignacion(String id,Expresion e) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
+								String.valueOf(e.getDireccion()),
+								null,
+								String.valueOf((tabla.getSimbolo(id)).getDireccion())));
+
+	}
+
+	void cerrarCI() {
+		codigoIntermedio.cerrarFicheroEscritura();
+	}
+
+	void condicion(Expresion e,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("SALTAR_CONDICION",
+					String.valueOf(e.getDireccion()),
+					null,
+					"ELSE_"+String.valueOf(n)));
+	}
+
+	void saltarEtiqueta(String eti,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("SALTAR_ETIQUETA",
+					null,
+					null,
+					eti+"_"+String.valueOf(n)));
+	}
+
+	void ponerEtiqueta(String eti,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("ETIQUETA",
+					null,
+					null,
+					eti+"_"+String.valueOf(n)));
+	}
+
+	void condicion2(Expresion e,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("SALTAR_CONDICION",
+					String.valueOf(e.getDireccion()),
+					null,
+					"FINBUCLE_"+String.valueOf(n)));
+	}
+
+	void imprimirW(Expresion e) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("IMPRIMIR_ENTERO",
+					String.valueOf(e.getDireccion()),
+					null,
+					null));
+	}
+
+	void imprimirS(String c,int cuenta) {
+		listaCadenas.addCadena(c);
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("IMPRIMIR_CADENA",
+					"CADENA_"+String.valueOf(cuenta),
+					null,
+					null));
+	}
+
+	void generarCadenas() {
+		for(int i=0;i<listaCadenas.size();i++) {
+			codigoIntermedio.guardarCuadrupla(new Cuadrupla("PONER_CADENA",
+					"CADENA_"+String.valueOf(i+1),
+					null,
+					listaCadenas.getCadena(i)));
+		}
+	}
+
+	void generarCF() {
+		CodigoFinal codigoFinal = new CodigoFinal(codigoIntermedio,parser.nombreFichero);
+		try {
+			codigoFinal.traducirCodigo();
+		} catch(Exception e) {}
+	}
+
+	void finPrograma() {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("FIN",null,null,null));
+	}
+
+:}
+
