@@ -8,19 +8,59 @@ import java.io.IOException;
 
 parser code {:
 
-    void inicializar() 
-    {
-        //CODIGO INTERMEDIO
-        
-    }
-
-    
 :};
+
 
 //----> ACTION CODE
  
 action code {:
 
+    void inicializar() 
+    {
+        tabla = new Table();
+        cuentaWhiles = 0;
+        cuentaDirecciones = 9999;
+    }
+
+    //CODIGO INTERMEDIO
+    //CARGAR VALOR
+    Expresion entero(String e) 
+    {
+        cuentaDirecciones++;
+        codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_VALOR", e, null, String.valueOf(cuentaDirecciones)));
+        return new Expresion(cuentaDirecciones);
+    }
+    
+    //CARGAR DIRECCION
+    Expresion identificador(String id) 
+    {
+        cuentaDirecciones++;
+        codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
+        String.valueOf((tabla.getSimbolo(id)).getDireccion()), null, String.valueOf(cuentaDirecciones)));
+        return new Expresion(cuentaDirecciones);
+    }
+    
+    //SUMAR
+    Expresion suma(Expresion e1,Expresion e2) 
+    {
+	cuentaDirecciones++;
+	codigoIntermedio.guardarCuadrupla(new Cuadrupla("SUMAR",String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+	return new Expresion(cuentaDirecciones);
+    }
+
+    //MULTIPLICAR
+    Expresion producto(Expresion e1,Expresion e2) 
+    {
+	cuentaDirecciones++;
+	codigoIntermedio.guardarCuadrupla(new Cuadrupla("MULTIPLICAR",String.valueOf(e1.getDireccion()),
+                                                                    String.valueOf(e2.getDireccion()),
+                                                                    String.valueOf(cuentaDirecciones)));
+	return new Expresion(cuentaDirecciones);
+    }
+
+    
 :};
 
 //----> TERMINALES
