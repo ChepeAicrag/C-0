@@ -7,7 +7,52 @@ import java.io.IOException;
 //----> PARSER CODE
 
 parser code {:
+	static String nombreFichero;
 
+	//Inicia el parser
+	public static void main(String args[]) {
+		if (args.length != 1)
+			System.out.println("No hay programa a procesar");
+		else {
+			try {
+				Yylex lexico = new Yylex(new FileReader(args[0]));
+				nombreFichero = (String)args[0];
+				new parser(lexico).parse();
+			}
+			catch (Exception e) {
+				System.out.println("El fichero del programa no existe o no esta abierto");
+			}
+		}
+	}
+
+	// Muestra el texto de un error
+	public void report_error(String message) {
+		System.err.println(message);
+	}
+
+	// Muestra un error de sintaxis
+	public void syntax_error(Symbol actual) {
+		if (actual.sym == sym.EOF)
+			report_error("Intruccion incompleta en linea : "+InformacionCodigo.linea+
+				       " Token : "+InformacionCodigo.token);
+		else
+			report_error("Error sintactico en linea : "+InformacionCodigo.linea+
+				       " Token : "+InformacionCodigo.token);
+	}
+
+	// Muestra el texto de un error irrecuperable
+	public void report_fatal_error(String message, Object info) {
+		System.err.println(message);
+	}
+
+	// Muestra un mensaje cuando no se puede seguir analizando
+	public void unrecovered_syntax_error(Symbol actual) {
+	}
+
+	//Muestra un mensaje de error con linea, token y mensaje
+	public void error(String mensaje) {
+		report_error("ERROR -> Linea: "+InformacionCodigo.linea+" Lexema: "+InformacionCodigo.token+" "+mensaje);
+	}
 :};
 
 //----> ACTION CODE
