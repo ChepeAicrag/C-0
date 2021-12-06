@@ -46,58 +46,128 @@ terminal String CADENATEXTO;
 terminal String ID;
 terminal String ENTERO;
 
-//----> NO TERMINALES 
-non terminal Programa, Declaraciones, Cuerpo;
-non terminal BloqueSentencias;
-non terminal Declaracion;
-non terminal Sentencias, Sentencia;
-non terminal BloqueSentencias;
-non terminal Expresion;
-non terminal Condicion;
-non terminal SentIf, SentElse;
-non terminal SentWhile;
-non terminal SentAsignacion;
-non terminal SentPutw, SentPuts;
-non terminal SentBreak;
-
 //------>PRECEDENCIA
 precedence left ASIGNAR;
-precedence left OR;
-precedence left AND;
-precedence left IGUAL,DISTINTO;
-precedence left MAYOR,MENOR;
-precedence left SUMA,RESTA;
+precedence left OR, AND;
+precedence left DISTINTO, IGUAL, MAYOR, MENOR;
+precedence left SUMA, RESTA;
 precedence right PRODUCTO, DIVISION;
 precedence right PARENTIZQ, PARENDER;
 
 start with Programa;
 
+//Semantico
 
-//----> REGLAS DE GRAMÁTICA
-Programa ::= Declaraciones Cuerpo | Cuerpo;
+Programa ::= {:
+			inicializar();
+		 :}
+		 Declaraciones Cuerpo | Cuerpo;
 
-Declaraciones ::= Declaracion Declaraciones | Declaracion;
-Declaracion ::= INT ID PUNTOCOMA;
+Declaraciones ::= Declaraciones Declaracion | Declaracion;
 
-Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER;
+Declaracion ::= INT ID:id PUNTOCOMA
+			{:
+				if(existeSimbolo(id)) {
+					parser.error(Textos.simboloRedeclarado);
+				} else {
+					addSimbolo(id);
+					cuentaDirecciones++;
+					setDireccionSimbolo(id,cuentaDirecciones);
+				}
+			:}
+		    ;
 
-//para expresiones
-Expresion ::= Expresion SUMA Expresion |
-Expresion RESTA Expresion |
-Expresion PRODUCTO Expresion |
-Expresion DIVISION Expresion |
-ENTERO |
-ID |
-PARENTIZQ Expresion PARENDER;
+Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias
+			{:
+				finPrograma();
+				generarCadenas();
+				cerrarCI();
+				generarCF();
+			:}
+	     LLAVEDER;
 
-//para if y while
-Condicion ::= Expresion OR Expresion |
-Expresion AND Expresion |
-Expresion IGUAL Expresion |
-Expresion DISTINTO Expresion |
-Expresion MAYOR Expresion |
-Expresion MENOR Expresion |
-PARENTIZQ Condicion PARENDER;
+BloqueSentencias ::= Sentencias |;
+
+Sentencias ::= Sentencias Sentencia | Sentencia;
+
+
+Expresion ::= Expresion:e1 SUMA Expresion:e2
+			{:
+				RESULT=suma(e1,e2);
+			:}
+              |
+		  Expresion:e1 RESTA Expresion:e2
+			{:
+				RESULT=resta(e1,e2);
+			:}
+		  |
+              Expresion:e1 PRODUCTO Expresion:e2
+			{:
+				RESULT=producto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DIVISION Expresion:e2
+			{:
+				RESULT=division(e1,e2);
+			:}
+		  |
+		  ENTERO:e
+			{:
+				RESULT=entero(e);
+			:}
+		  |
+		  ID:id
+			{:
+				if(existeSimbolo(id)) {
+					RESULT=identificador(id);
+				} else {
+					parser.error(Textos.simboloNoDeclarado);
+					RESULT=identificador(null);
+				}
+			:}
+		  |
+	   	  PARENTIZQ Expresion:e PARENDER
+			{:
+				RESULT=e;
+			:}
+		  ;
+
+Condicion ::= Condicion:c1 OR Condicion:c2
+			{:
+				RESULT=or(c1,c2);
+			:}
+	        |
+		  Condicion:c1 AND Condicion:c2
+			{:
+				RESULT=and(c1,c2);
+			:}
+		  |
+      	  Expresion:e1 IGUAL Expresion:e2
+			{:
+				RESULT=igual(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DISTINTO Expresion:e2
+			{:
+				RESULT=distinto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MAYOR Expresion:e2
+			{:
+				RESULT=mayor(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MENOR Expresion:e2
+			{:
+				RESULT=menor(e1,e2);
+			:}
+		  |
+		  PARENTIZQ Condicion:c PARENDER
+			{:
+				RESULT=c;
+			:}
+              ;
+//----->
 
 
 //Reglas para los bloques
