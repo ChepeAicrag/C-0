@@ -4,17 +4,288 @@ import java_cup.runtime.*;
 import java.io.FileReader;
 import java.io.IOException;
 
-//----> PARSER CODE
+//----> PARSER CODE --
 
 parser code {:
+	static String nombreFichero;
 
+	//Inicia el parser
+	public static void main(String args[]) {
+		if (args.length != 1)
+			System.out.println("No hay programa a procesar");
+		else {
+			try {
+				Yylex lexico = new Yylex(new FileReader(args[0]));
+				nombreFichero = (String)args[0];
+				new parser(lexico).parse();
+			}
+			catch (Exception e) {
+				System.out.println("El fichero del programa no existe o no esta abierto");
+			}
+		}
+	}
+
+	// Muestra el texto de un error
+	public void report_error(String message) {
+		System.err.println(message);
+	}
+
+	// Muestra un error de sintaxis
+	public void syntax_error(Symbol actual) {
+		if (actual.sym == sym.EOF)
+			report_error("Intruccion incompleta en linea : "+InformacionCodigo.linea+
+				       " Token : "+InformacionCodigo.token);
+		else
+			report_error("Error sintactico en linea : "+InformacionCodigo.linea+
+				       " Token : "+InformacionCodigo.token);
+	}
+
+	// Muestra el texto de un error irrecuperable
+	public void report_fatal_error(String message, Object info) {
+		System.err.println(message);
+	}
+
+	// Muestra un mensaje cuando no se puede seguir analizando
+	public void unrecovered_syntax_error(Symbol actual) {
+	}
+
+	//Muestra un mensaje de error con linea, token y mensaje
+	public void error(String mensaje) {
+		report_error("ERROR -> Linea: "+InformacionCodigo.linea+" Lexema: "+InformacionCodigo.token+" "+mensaje);
+	}
 :};
+
 
 //----> ACTION CODE
  
 action code {:
+	Tabla tabla;
+	int cuentaWhiles;
+	int cuentaDirecciones;
+	CodigoIntermedio codigoIntermedio;
+	int cuentaIf;
+	Pila pilaIf;
+	int cuentaBucle;
+	Pila pilaBucle;
+	int cuentaCadenas;
+	Lista listaCadenas;
 
-:};
+	void inicializar() {
+		tabla = new Tabla();
+		cuentaWhiles = 0;
+		cuentaDirecciones = 9999;
+		cuentaIf = 0;
+		pilaIf = new Pila();
+		cuentaBucle = 0;
+		pilaBucle = new Pila();
+		cuentaCadenas = 0;
+		listaCadenas = new Lista();
+		String nombre = parser.nombreFichero.substring(0,parser.nombreFichero.lastIndexOf("."));
+		codigoIntermedio = new CodigoIntermedio(nombre+".ci");
+		try {
+			codigoIntermedio.abrirFicheroEscritura();
+		} catch (IOException e) {
+			System.out.println(Textos.ficheroCiNoExiste);
+			codigoIntermedio.cerrarFicheroEscritura();
+		}
+	}
+
+	boolean existeSimbolo(String id) {
+		return tabla.existeSimbolo(id);
+	}
+
+	void addSimbolo(String id) {
+		tabla.addSimbolo(id);
+	}
+
+	void setDireccionSimbolo(String id,int dir) {
+		tabla.setDireccionSimbolo(id,dir);
+	}
+
+	Expresion suma(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("SUMAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion resta(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("RESTAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion producto(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("MULTIPLICAR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion division(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("DIVIDIR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion entero(String e) {
+		cuentaDirecciones++;
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_VALOR",
+								e,
+								null,
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion identificador(String id) {
+		cuentaDirecciones++;
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
+								String.valueOf((tabla.getSimbolo(id)).getDireccion()),
+								null,
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion or(Expresion c1,Expresion c2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("OR",
+								String.valueOf(c1.getDireccion()),
+								String.valueOf(c2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion and(Expresion c1,Expresion c2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("AND",
+								String.valueOf(c1.getDireccion()),
+								String.valueOf(c2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion mayor(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("MAYOR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion menor(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("MENOR",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion igual(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("IGUAL",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	Expresion distinto(Expresion e1,Expresion e2) {
+		cuentaDirecciones++;
+	      codigoIntermedio.guardarCuadrupla(new Cuadrupla("DISTINTO",
+								String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+		return new Expresion(cuentaDirecciones);
+	}
+
+	void asignacion(String id,Expresion e) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
+								String.valueOf(e.getDireccion()),
+								null,
+								String.valueOf((tabla.getSimbolo(id)).getDireccion())));
+
+	}
+
+	void cerrarCI() {
+		codigoIntermedio.cerrarFicheroEscritura();
+	}
+
+	void condicion(Expresion e,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("SALTAR_CONDICION",
+					String.valueOf(e.getDireccion()),
+					null,
+					"ELSE_"+String.valueOf(n)));
+	}
+
+	void saltarEtiqueta(String eti,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("SALTAR_ETIQUETA",
+					null,
+					null,
+					eti+"_"+String.valueOf(n)));
+	}
+
+	void ponerEtiqueta(String eti,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("ETIQUETA",
+					null,
+					null,
+					eti+"_"+String.valueOf(n)));
+	}
+
+	void condicion2(Expresion e,int n) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("SALTAR_CONDICION",
+					String.valueOf(e.getDireccion()),
+					null,
+					"FINBUCLE_"+String.valueOf(n)));
+	}
+
+	void imprimirW(Expresion e) {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("IMPRIMIR_ENTERO",
+					String.valueOf(e.getDireccion()),
+					null,
+					null));
+	}
+
+	void imprimirS(String c,int cuenta) {
+		listaCadenas.addCadena(c);
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("IMPRIMIR_CADENA",
+					"CADENA_"+String.valueOf(cuenta),
+					null,
+					null));
+	}
+
+	void generarCadenas() {
+		for(int i=0;i<listaCadenas.size();i++) {
+			codigoIntermedio.guardarCuadrupla(new Cuadrupla("PONER_CADENA",
+					"CADENA_"+String.valueOf(i+1),
+					null,
+					listaCadenas.getCadena(i)));
+		}
+	}
+
+	void generarCF() {
+		CodigoFinal codigoFinal = new CodigoFinal(codigoIntermedio,parser.nombreFichero);
+		try {
+			codigoFinal.traducirCodigo();
+		} catch(Exception e) {}
+	}
+
+	void finPrograma() {
+		codigoIntermedio.guardarCuadrupla(new Cuadrupla("FIN",null,null,null));
+	}
+
+:}
 
 //----> TERMINALES
 
@@ -48,12 +319,18 @@ terminal String ENTERO;
 
 //----> NO TERMINALES
 non terminal Programa, Declaraciones, Cuerpo;
-non terminal BloqueSentencias;
 non terminal Declaracion;
+non terminal BloqueSentencias;
 non terminal Sentencias, Sentencia;
+non terminal Expresion Expresion;
+non terminal Expresion Condicion;
+non terminal SentIf, SentElse;
+non terminal SentWhile;
+non terminal SentAsignacion;
+non terminal SentPutw, SentPuts;
+non terminal SentBreak;
 
-// PRECEDENCIAS
-
+//------>PRECEDENCIA
 precedence left ASIGNAR;
 precedence left OR, AND;
 precedence left DISTINTO, IGUAL, MAYOR, MENOR;
@@ -63,20 +340,204 @@ precedence right PARENTIZQ, PARENDER;
 
 start with Programa;
 
-//----> REGLAS DE GRAMÁTICA
+//Semantico
 
-Programa ::= Declaraciones Cuerpo | Cuerpo;
+Programa ::= {:
+			inicializar();
+		 :}
+		 Declaraciones Cuerpo | Cuerpo;
 
-Declaraciones ::= Declaracion Declaraciones | Declaracion;
+Declaraciones ::= Declaraciones Declaracion | Declaracion;
 
-Declaracion ::= INT ID PUNTOCOMA;
+Declaracion ::= INT ID:id PUNTOCOMA
+			{:
+				if(existeSimbolo(id)) {
+					parser.error(Textos.simboloRedeclarado);
+				} else {
+					addSimbolo(id);
+					cuentaDirecciones++;
+					setDireccionSimbolo(id,cuentaDirecciones);
+				}
+			:}
+		    ;
 
-//----> Probando solo estructural del programa Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER | MAIN PARENTIZQ PARENDER LLAVEIZQ LLAVEDER;
+Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias
+			{:
+				finPrograma();
+				generarCadenas();
+				cerrarCI();
+				generarCF();
+			:}
+	     LLAVEDER;
 
-Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias LLAVEDER;
-
-//----> Autor para sentencias vacías
- 
-BloqueSentencias ::= Sentencias | ;
+BloqueSentencias ::= Sentencias |;
 
 Sentencias ::= Sentencias Sentencia | Sentencia;
+
+
+Expresion ::= Expresion:e1 SUMA Expresion:e2
+			{:
+				RESULT=suma(e1,e2);
+			:}
+              |
+		  Expresion:e1 RESTA Expresion:e2
+			{:
+				RESULT=resta(e1,e2);
+			:}
+		  |
+              Expresion:e1 PRODUCTO Expresion:e2
+			{:
+				RESULT=producto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DIVISION Expresion:e2
+			{:
+				RESULT=division(e1,e2);
+			:}
+		  |
+		  ENTERO:e
+			{:
+				RESULT=entero(e);
+			:}
+		  |
+		  ID:id
+			{:
+				if(existeSimbolo(id)) {
+					RESULT=identificador(id);
+				} else {
+					parser.error(Textos.simboloNoDeclarado);
+					RESULT=identificador(null);
+				}
+			:}
+		  |
+	   	  PARENTIZQ Expresion:e PARENDER
+			{:
+				RESULT=e;
+			:}
+		  ;
+
+Condicion ::= Condicion:c1 OR Condicion:c2
+			{:
+				RESULT=or(c1,c2);
+			:}
+	        |
+		  Condicion:c1 AND Condicion:c2
+			{:
+				RESULT=and(c1,c2);
+			:}
+		  |
+      	  Expresion:e1 IGUAL Expresion:e2
+			{:
+				RESULT=igual(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DISTINTO Expresion:e2
+			{:
+				RESULT=distinto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MAYOR Expresion:e2
+			{:
+				RESULT=mayor(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MENOR Expresion:e2
+			{:
+				RESULT=menor(e1,e2);
+			:}
+		  |
+		  PARENTIZQ Condicion:c PARENDER
+			{:
+				RESULT=c;
+			:}
+              ;
+If ::= IF PARENTIZQ
+			{:
+				cuentaIf++;
+				pilaIf.apilar(cuentaIf);
+			:}
+           Condicion:c
+			{:
+				condicion(c,pilaIf.verCima());
+			:}
+	     PARENDER LLAVEIZQ BloqueSentencias LLAVEDER
+			{:
+				saltarEtiqueta("FINIF",pilaIf.verCima());
+				ponerEtiqueta("ELSE",pilaIf.verCima());
+			:}
+	     SentElse
+			{:
+				ponerEtiqueta("FINIF",pilaIf.verCima());
+				pilaIf.desapilar();
+			:}
+           ;
+
+SentElse ::= ELSE LLAVEIZQ BloqueSentencias LLAVEDER |;
+
+SentWhile ::= WHILE PARENTIZQ
+			{:
+				cuentaBucle++;
+				pilaBucle.apilar(cuentaBucle);
+				ponerEtiqueta("BUCLE",pilaBucle.verCima());
+			:}
+		  Condicion:c
+			{:
+				condicion2(c,pilaBucle.verCima());
+			:}
+		  PARENDER LLAVEIZQ
+			{:
+				cuentaWhiles++;
+			:}
+		  BloqueSentencias
+			{:
+				cuentaWhiles--;
+			:}
+		  LLAVEDER
+			{:
+				saltarEtiqueta("BUCLE",pilaBucle.verCima());
+				ponerEtiqueta("FINBUCLE",pilaBucle.verCima());
+				pilaBucle.desapilar();
+			:}
+		  ;
+
+SentAsignacion ::= ID:id
+			{:
+			if(existeSimbolo(id)) {
+			} else {
+				parser.error(Textos.simboloNoDeclarado);
+			}
+			:}
+		 ASIGNAR Expresion:e PUNTOCOMA
+			{:
+				asignacion(id,e);
+			:}
+	         ;
+
+SentPutw ::= PUTW PARENTIZQ Expresion:e
+			{:
+				imprimirW(e);
+			:}
+	       PARENDER PUNTOCOMA;
+
+SentPuts ::= PUTS PARENTIZQ CADENATEXTO:c
+			{:
+				cuentaCadenas++;
+				imprimirS(c,cuentaCadenas);
+			:}
+	       PARENDER PUNTOCOMA;
+
+SentBreak ::= BREAK
+			{:
+			if(cuentaWhiles>0) {
+			} else {
+				parser.error(Textos.breakSinWhile);
+			}
+			:}
+		  PUNTOCOMA;
+
+Sentencia ::= SentIf |
+		  SentWhile |
+		  SentAsignacion |
+		  SentPutw |
+		  SentPuts |
+		  SentBreak;
