@@ -4,7 +4,7 @@ import java_cup.runtime.*;
 import java.io.FileReader;
 import java.io.IOException;
 
-//----> PARSER CODE
+//----> PARSER CODE --
 
 parser code {:
 	static String nombreFichero;
@@ -55,10 +55,10 @@ parser code {:
 	}
 :};
 
+
 //----> ACTION CODE
  
 action code {:
-
 	Tabla tabla;
 	int cuentaWhiles;
 	int cuentaDirecciones;
