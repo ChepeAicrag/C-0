@@ -167,30 +167,93 @@ Condicion ::= Condicion:c1 OR Condicion:c2
 				RESULT=c;
 			:}
               ;
-//----->
+If ::= IF PARENTIZQ
+			{:
+				cuentaIf++;
+				pilaIf.apilar(cuentaIf);
+			:}
+           Condicion:c
+			{:
+				condicion(c,pilaIf.verCima());
+			:}
+	     PARENDER LLAVEIZQ BloqueSentencias LLAVEDER
+			{:
+				saltarEtiqueta("FINIF",pilaIf.verCima());
+				ponerEtiqueta("ELSE",pilaIf.verCima());
+			:}
+	     SentElse
+			{:
+				ponerEtiqueta("FINIF",pilaIf.verCima());
+				pilaIf.desapilar();
+			:}
+           ;
 
-
-//Reglas para los bloques
-SentIf ::= IF PARENTIZQ Condicion PARENDER;
-LLAVEIZQ BloqueSentencias LLAVEDER SentElse;
 SentElse ::= ELSE LLAVEIZQ BloqueSentencias LLAVEDER |;
 
-//sentencia while
-SentWhile ::= WHILE PARENTIZQ Condicion PARENDER
-LLAVEIZQ BloqueSentencias LLAVEDER;
+SentWhile ::= WHILE PARENTIZQ
+			{:
+				cuentaBucle++;
+				pilaBucle.apilar(cuentaBucle);
+				ponerEtiqueta("BUCLE",pilaBucle.verCima());
+			:}
+		  Condicion:c
+			{:
+				condicion2(c,pilaBucle.verCima());
+			:}
+		  PARENDER LLAVEIZQ
+			{:
+				cuentaWhiles++;
+			:}
+		  BloqueSentencias
+			{:
+				cuentaWhiles--;
+			:}
+		  LLAVEDER
+			{:
+				saltarEtiqueta("BUCLE",pilaBucle.verCima());
+				ponerEtiqueta("FINBUCLE",pilaBucle.verCima());
+				pilaBucle.desapilar();
+			:}
+		  ;
 
-//sentencia de asignacion
-SentAsignacion ::= ID ASIGNAR Expresion PUNTOCOMA;
+SentAsignacion ::= ID:id
+			{:
+			if(existeSimbolo(id)) {
+			} else {
+				parser.error(Textos.simboloNoDeclarado);
+			}
+			:}
+		 ASIGNAR Expresion:e PUNTOCOMA
+			{:
+				asignacion(id,e);
+			:}
+	         ;
 
-//snetencia para imprimir enteros y cadenas
-SentPutw ::= PUTW PARENTIZQ Expresion PARENDER PUNTOCOMA;
-SentPuts ::= PUTS PARENTIZQ CADENATEXTO PARENDER PUNTOCOMA;
-//Salir del while
-SentBreak ::= BREAK PUNTOCOMA;
+SentPutw ::= PUTW PARENTIZQ Expresion:e
+			{:
+				imprimirW(e);
+			:}
+	       PARENDER PUNTOCOMA;
+
+SentPuts ::= PUTS PARENTIZQ CADENATEXTO:c
+			{:
+				cuentaCadenas++;
+				imprimirS(c,cuentaCadenas);
+			:}
+	       PARENDER PUNTOCOMA;
+
+SentBreak ::= BREAK
+			{:
+			if(cuentaWhiles>0) {
+			} else {
+				parser.error(Textos.breakSinWhile);
+			}
+			:}
+		  PUNTOCOMA;
 
 Sentencia ::= SentIf |
-SentWhile |
-SentAsignacion |
-SentPutw |
-SentPuts |
-SentBreak;
+		  SentWhile |
+		  SentAsignacion |
+		  SentPutw |
+		  SentPuts |
+		  SentBreak;
