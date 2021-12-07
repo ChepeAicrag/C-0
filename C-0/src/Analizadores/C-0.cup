@@ -317,6 +317,19 @@ terminal String CADENATEXTO;
 terminal String ID;
 terminal String ENTERO;
 
+//----> NO TERMINALES
+non terminal Programa, Declaraciones, Cuerpo;
+non terminal Declaracion;
+non terminal BloqueSentencias;
+non terminal Sentencias, Sentencia;
+non terminal Expresion Expresion;
+non terminal Expresion Condicion;
+non terminal SentIf, SentElse;
+non terminal SentWhile;
+non terminal SentAsignacion;
+non terminal SentPutw, SentPuts;
+non terminal SentBreak;
+
 //------>PRECEDENCIA
 precedence left ASIGNAR;
 precedence left OR, AND;
