@@ -1,91 +1,77 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package Analizadores;
+
 import java.util.Vector;
 
-class Tabla {
+/**
+ *
+ * @author lucy_
+ */
+public class Tabla {
 
-	private Vector tablaSimbolos;
-	private Vector tablaTipos;
+    private Vector<Simbolo> tablaSimbolos;
+    private Vector<Tipo> tablaTipos;
 
-	Tabla() {
-		tablaSimbolos = new Vector();
-		tablaTipos = new Vector();
-		addTipo("int");
-	}
+    public Tabla() {
+        tablaSimbolos = new Vector<>();
+        tablaTipos = new Vector<>();
+        addSimbolo("int");
+    }
 
-	void addSimbolo(String id) {
-		tablaSimbolos.add(new Simbolo(countSimbolos(),id));
-	}
+    public void addSimbolo(String id) {
+        tablaSimbolos.add(new Simbolo(tablaSimbolos.size(), id));
+    }
 
-	void addTipo(String id) {
-		tablaTipos.add(new Tipo(countTipos(),id));
-	}
+    public void addTipo(String id) {
+        tablaTipos.add(new Tipo(tablaTuipos.size(), id));
+    }
 
-	int countSimbolos() {
-		return tablaSimbolos.size();
-	}
+    public boolean existeSimbolo(String id) {
+        return getSimbolo(id) != null;
+    }
+    
+    public boolean existeTipo(String id) {
+		    return getTipo(id) != null; 
+	  }	
+  
+    public Simbolo getSimbolo(String id) {
+        for (Simbolo simbolo : tablaSimbolos) {
+            if (simbolo.getId().equals(id)) {
+                return simbolo;
+            }
+        }
+        return null;
+    }
+  
+    public Tipo getTipo(String id) {
+        for (Tipo tipo : tablaTipos) {
+            if (tipo.getId().equals(id)) {
+                return stipo;
+            }
+        }
+        return null;
+    }
+  
+    public Simbolo getSimbolo(int pos) {
+		      return tablaSimbolos.elementAt(pos);
+	  }
 
-	int countTipos() {
-		return tablaTipos.size();
-	}
+	  public Tipo getTipo(int pos) {
+		    return tablaTipos.elementAt(pos);
+	  }
 
-	Simbolo getSimbolo(int pos) {
-		return (Simbolo)tablaSimbolos.elementAt(pos);
-	}
+    public void setSimbolo(Simbolo s) {
+        int cod = s.getCod();
+        tablaSimbolos.setElementAt(s, cod);
+    }
 
-	Tipo getTipo(int pos) {
-		return (Tipo)tablaTipos.elementAt(pos);
-	}
-
-	Simbolo getSimbolo(String id) {
-		Simbolo simbolo = null;
-		for(int i=0;i<countSimbolos();i++) {
-			simbolo = getSimbolo(i);
-			if(simbolo.getId().equals(id)) {
-				break;
-			} else {
-				simbolo = null;
-			}
-		}
-		return simbolo;
-	}
-
-	Tipo getTipo(String id) {
-		Tipo tipo = null;
-		for(int i=0;i<countTipos();i++) {
-			tipo = getTipo(i);
-			if(tipo.getId().equals(id)) {
-				break;
-			} else {
-				tipo = null;
-			}
-		}
-		return tipo;
-	}
-
-	boolean existeSimbolo(String id) {
-		if(getSimbolo(id)!=null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	boolean existeTipo(String id) {
-		if(getTipo(id)!=null) {
-			return true;
-		} else {
-			return false;
-		}
-	}	
-
-	void setSimbolo(Simbolo s) {
-		int cod = s.getCod();
-		tablaSimbolos.setElementAt(s,cod);
-	}
-
-	void setDireccionSimbolo(String id,int d) {
-		Simbolo simbolo = getSimbolo(id);
-		simbolo.setDireccion(d);
-		setSimbolo(simbolo);
-	}
+    void setDireccionSimbolo(String id, int d) {
+        Simbolo simbolo = getSimbolo(id);
+        simbolo.setDireccion(d);
+        setSimbolo(simbolo);
+    }
 }
