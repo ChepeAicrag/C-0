@@ -23,17 +23,21 @@ public class Tabla {
     }
 
     public void addSimbolo(String id) {
-        tablaSimbolos.add(new Simbolo());
+        tablaSimbolos.add(new Simbolo(tablaSimbolos.size(), id));
     }
 
     public void addTipo(String id) {
-        tablaTipos.add(new Tipo());
+        tablaTipos.add(new Tipo(tablaTuipos.size(), id));
     }
 
     public boolean existeSimbolo(String id) {
         return getSimbolo(id) != null;
     }
-
+    
+    public boolean existeTipo(String id) {
+		    return getTipo(id) != null; 
+	  }	
+  
     public Simbolo getSimbolo(String id) {
         for (Simbolo simbolo : tablaSimbolos) {
             if (simbolo.getId().equals(id)) {
@@ -42,6 +46,23 @@ public class Tabla {
         }
         return null;
     }
+  
+    public Tipo getTipo(String id) {
+        for (Tipo tipo : tablaTipos) {
+            if (tipo.getId().equals(id)) {
+                return stipo;
+            }
+        }
+        return null;
+    }
+  
+    public Simbolo getSimbolo(int pos) {
+		      return tablaSimbolos.elementAt(pos);
+	  }
+
+	  public Tipo getTipo(int pos) {
+		    return tablaTipos.elementAt(pos);
+	  }
 
     public void setSimbolo(Simbolo s) {
         int cod = s.getCod();

@@ -16,9 +16,15 @@ public class Simbolo {
     private int cod;
     
     public Simbolo(){
-        
+        cod = -1;
+		    id = "";
     }
     
+    public Simbolo(int c, String i) {
+		    cod = c;
+		    id = i;
+	  }
+  
     public void setDireccion(int d){
         direccion = d;
     }

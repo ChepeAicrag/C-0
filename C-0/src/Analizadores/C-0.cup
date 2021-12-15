@@ -4,6 +4,7 @@ import java_cup.runtime.*;
 import java.io.FileReader;
 import java.io.IOException;
 
+
 //----> PARSER CODE --
 
 parser code {:
@@ -101,6 +102,60 @@ action code {:
 	void setDireccionSimbolo(String id,int dir) {
 		tabla.setDireccionSimbolo(id,dir);
 	}
+
+
+    void inicializar() 
+    {
+        tabla = new Table();
+        cuentaWhiles = 0;
+        cuentaDirecciones = 9999;
+    }
+
+
+    void setDireccionSimbolo(String id,int dir) 
+    {
+        tabla.setDireccionSimbolo(id,dir);
+    }
+
+    //CODIGO INTERMEDIO
+    //CARGAR VALOR
+    Expresion entero(String e) 
+    {
+        cuentaDirecciones++;
+        codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_VALOR", e, null, String.valueOf(cuentaDirecciones)));
+        return new Expresion(cuentaDirecciones);
+    }
+    
+    //CARGAR DIRECCION
+    Expresion identificador(String id) 
+    {
+        cuentaDirecciones++;
+        codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
+        String.valueOf((tabla.getSimbolo(id)).getDireccion()), null, String.valueOf(cuentaDirecciones)));
+        return new Expresion(cuentaDirecciones);
+    }
+    
+    //SUMAR
+    Expresion suma(Expresion e1,Expresion e2) 
+    {
+	cuentaDirecciones++;
+	codigoIntermedio.guardarCuadrupla(new Cuadrupla("SUMAR",String.valueOf(e1.getDireccion()),
+								String.valueOf(e2.getDireccion()),
+								String.valueOf(cuentaDirecciones)));
+	return new Expresion(cuentaDirecciones);
+    }
+
+    //MULTIPLICAR
+    Expresion producto(Expresion e1,Expresion e2) 
+    {
+	cuentaDirecciones++;
+	codigoIntermedio.guardarCuadrupla(new Cuadrupla("MULTIPLICAR",String.valueOf(e1.getDireccion()),
+                                                                    String.valueOf(e2.getDireccion()),
+                                                                    String.valueOf(cuentaDirecciones)));
+	return new Expresion(cuentaDirecciones);
+    }
+
+    // METODOS DE LAS REGAS
 
 	Expresion suma(Expresion e1,Expresion e2) {
 		cuentaDirecciones++;
@@ -343,23 +398,64 @@ start with Programa;
 //Semantico
 
 Programa ::= {:
-			inicializar();
-		 :}
-		 Declaraciones Cuerpo | Cuerpo;
+
+		inicializar();
+            :}
+Declaraciones Cuerpo | Cuerpo;
 
 Declaraciones ::= Declaraciones Declaracion | Declaracion;
 
-Declaracion ::= INT ID:id PUNTOCOMA
+Declaracion ::= INT ID:id PTOCOMA 
+    {:
+        if(existeSimbolo(id)) 
+        {
+            parser.error(Textos.simboloRedeclarado);
+        } 
+        else 
+        {
+            addSimbolo(id);
+            cuentaDirecciones++;
+            setDireccionSimbolo(id,cuentaDirecciones);
+        }
+    :}
+    ;
+
+
+Condicion ::= Condicion:c1 OR Condicion:c2 
 			{:
-				if(existeSimbolo(id)) {
-					parser.error(Textos.simboloRedeclarado);
-				} else {
-					addSimbolo(id);
-					cuentaDirecciones++;
-					setDireccionSimbolo(id,cuentaDirecciones);
-				}
+				RESULT=or(c1,c2);
 			:}
-		    ;
+	        |
+		  Condicion:c1 AND Condicion:c2 
+			{:
+				RESULT=and(c1,c2);
+			:}
+		  |
+      	  Expresion:e1 IGUAL Expresion:e2 
+			{:
+				RESULT=igual(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DISTINTO Expresion:e2 
+			{:
+				RESULT=distinto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MAYOR Expresion:e2 
+			{:
+				RESULT=mayor(e1,e2);
+			:}
+		  |
+		  Expresion:e1 MENOR Expresion:e2 
+			{:
+				RESULT=menor(e1,e2);
+			:}
+		  |
+		  LPAREN Condicion:c RPAREN
+			{:
+				RESULT=c;
+			:}
+              ;
 
 Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias
 			{:
@@ -374,33 +470,35 @@ BloqueSentencias ::= Sentencias |;
 
 Sentencias ::= Sentencias Sentencia | Sentencia;
 
+//---->Reglas de evaluación de expresiones
 
-Expresion ::= Expresion:e1 SUMA Expresion:e2
+    Expresion ::= Expresion:e1 SUMA Expresion:e2 
+
 			{:
 				RESULT=suma(e1,e2);
 			:}
-              |
-		  Expresion:e1 RESTA Expresion:e2
+      |
+		  Expresion:e1 RESTA Expresion:e2 
 			{:
 				RESULT=resta(e1,e2);
 			:}
 		  |
-              Expresion:e1 PRODUCTO Expresion:e2
+        Expresion:e1 PRODUCTO Expresion:e2 
 			{:
 				RESULT=producto(e1,e2);
 			:}
 		  |
-		  Expresion:e1 DIVISION Expresion:e2
+		  Expresion:e1 DIVISION Expresion:e2 
 			{:
 				RESULT=division(e1,e2);
 			:}
 		  |
-		  ENTERO:e
+		  ENTERO:e 
 			{:
 				RESULT=entero(e);
 			:}
 		  |
-		  ID:id
+		  ID:id 
 			{:
 				if(existeSimbolo(id)) {
 					RESULT=identificador(id);
@@ -416,42 +514,44 @@ Expresion ::= Expresion:e1 SUMA Expresion:e2
 			:}
 		  ;
 
-Condicion ::= Condicion:c1 OR Condicion:c2
+//-------->CONDICIONES
+Condicion ::= Condicion:c1 OR Condicion:c2 
 			{:
 				RESULT=or(c1,c2);
 			:}
-	        |
-		  Condicion:c1 AND Condicion:c2
+	    |
+		  Condicion:c1 AND Condicion:c2 
 			{:
 				RESULT=and(c1,c2);
 			:}
 		  |
-      	  Expresion:e1 IGUAL Expresion:e2
+      	Expresion:e1 IGUAL Expresion:e2 
 			{:
 				RESULT=igual(e1,e2);
 			:}
 		  |
-		  Expresion:e1 DISTINTO Expresion:e2
+		  Expresion:e1 DISTINTO Expresion:e2 
 			{:
 				RESULT=distinto(e1,e2);
 			:}
 		  |
-		  Expresion:e1 MAYOR Expresion:e2
+		  Expresion:e1 MAYOR Expresion:e2 
 			{:
 				RESULT=mayor(e1,e2);
 			:}
 		  |
-		  Expresion:e1 MENOR Expresion:e2
+		  Expresion:e1 MENOR Expresion:e2 
 			{:
 				RESULT=menor(e1,e2);
 			:}
 		  |
 		  PARENTIZQ Condicion:c PARENDER
-			{:
+      {:
 				RESULT=c;
 			:}
               ;
-If ::= IF PARENTIZQ
+              
+SentIf ::= IF PARENTIZQ
 			{:
 				cuentaIf++;
 				pilaIf.apilar(cuentaIf);
@@ -541,3 +641,4 @@ Sentencia ::= SentIf |
 		  SentPutw |
 		  SentPuts |
 		  SentBreak;
+
