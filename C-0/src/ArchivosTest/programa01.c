@@ -1,2 +1,2 @@
 int x;
-main(){}
+int $y;
