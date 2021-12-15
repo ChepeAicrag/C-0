@@ -38,33 +38,33 @@ Identificador = ({Letra})({Alfanumerico})*
 
 %%
 
-"(" 			{ return Token(sym.PARENTIZQ); }
-")" 			{ return Token(sym.PARENDER); }
-";"  			{ return Token(sym.PUNTOCOMA); }
-"+" 			{ return Token(sym.SUMA); }
-"-" 			{ return Token(sym.RESTA); }
-"*" 			{ return Token(sym.PRODUCTO); }
-"/" 			{ return Token(sym.DIVISION); }
-"<" 			{ return Token(sym.MENOR); }
-">" 			{ return Token(sym.MAYOR); }
-"==" 			{ return Token(sym.IGUAL); }
-"!=" 	 		{ return Token(sym.DISTINTO); }  
-"||" 			{ return Token(sym.OR); }
-"&&" 			{ return Token(sym.AND); }
-"=" 			{ return Token(sym.ASIGNAR); }
-"{" 			{ return Token(sym.LLAVEIZQ); }
-"}" 			{ return Token(sym.LLAVEDER); }
-"int"			{ return Token(sym.INT); }
-"main" 			{ return Token(sym.MAIN); }
-"if"			{ return Token(sym.IF); }
-"else" 			{ return Token(sym.ELSE); }
-"while"                 { return Token(sym.WHILE); }
-"puts" 			{ return Token(sym.PUTS); }
-"putw"			{ return Token(sym.PUTW); }
-"break"			{ return Token(sym.BREAK); }
-{CadenaTexto}   	{ return Token(sym.CADENATEXTO, yytext()); }
-{Identificador}         { return Token(sym.ID, yytext()); }
-{Digito}+		{ return Token(sym.ENTERO, yytext()); }
+"(" 			{ System.out.println("Reconocido: <<"+yytext()+ ">>"); return Token(sym.PARENTIZQ); }
+")" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.PARENDER); }
+";"  			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.PUNTOCOMA); }
+"+" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.SUMA); }
+"-" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.RESTA); }
+"*" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.PRODUCTO); }
+"/" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.DIVISION); }
+"<" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.MENOR); }
+">" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.MAYOR); }
+"==" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.IGUAL); }
+"!=" 	 		{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.DISTINTO); }  
+"||" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.OR); }
+"&&" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.AND); }
+"=" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.ASIGNAR); }
+"{" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.LLAVEIZQ); }
+"}" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.LLAVEDER); }
+"int"			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.INT); }
+"main" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.MAIN); }
+"if"			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.IF); }
+"else" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.ELSE); }
+"while"                 { System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.WHILE); }
+"puts" 			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.PUTS); }
+"putw"			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.PUTW); }
+"break"			{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.BREAK); }
+{CadenaTexto}   	{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.CADENATEXTO, yytext()); }
+{Identificador}         { System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.ID, yytext()); }
+{Digito}+		{ System.out.println("Reconocido: <<"+yytext()+">>"); return Token(sym.ENTERO, yytext()); }
 (" "|\n|\t|\r)+		{ /* ignore white space. */ }
 
 . { System.err.println("Caracter no permitido: "+yytext()); }

@@ -23,7 +23,7 @@ public class Tabla {
     }
 
     public void addSimbolo(String id) {
-        tablaSimbolos.add(new Simbolo());
+        tablaSimbolos.add(new Simbolo(tablaSimbolos.size(),id));
     }
 
     public void addTipo(String id) {
