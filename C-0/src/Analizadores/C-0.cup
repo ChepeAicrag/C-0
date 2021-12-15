@@ -4,6 +4,7 @@ import java_cup.runtime.*;
 import java.io.FileReader;
 import java.io.IOException;
 
+
 //----> PARSER CODE --
 
 parser code {:
@@ -870,4 +871,4 @@ Sentencia ::= SentIf |
 		  SentPutw |
 		  SentPuts |
 		  SentBreak;
->>>>>>> a2df9c12ddfb2b515132c3d0f6db22ecd892ebed
+
