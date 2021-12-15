@@ -25,7 +25,7 @@ public class GSintactico
         opciones[5] = "parser"; 
         
         //Le decimos donde se encuentra el archivo .cup 
-        opciones[6] = "src/Analizadores/C-0.cup"; 
+        opciones[6] = "src/Analizadores/c0.cup"; 
         try 
         {
             java_cup.Main.main(opciones);

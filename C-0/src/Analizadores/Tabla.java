@@ -17,21 +17,25 @@ public class Tabla {
     private Vector<Tipo> tablaTipos;
 
     public Tabla() {
-        tablaSimbolos = new Vector<>();
-        tablaTipos = new Vector<>();
+        tablaSimbolos = new Vector<Simbolo>();
+        tablaTipos = new Vector<Tipo>();
         addSimbolo("int");
     }
 
     public void addSimbolo(String id) {
-        tablaSimbolos.add(new Simbolo(tablaSimbolos.size(),id));
+        tablaSimbolos.add(new Simbolo(tablaSimbolos.size(), id));
     }
 
     public void addTipo(String id) {
-        tablaTipos.add(new Tipo());
+        tablaTipos.add(new Tipo(tablaTipos.size(), id));
     }
 
     public boolean existeSimbolo(String id) {
         return getSimbolo(id) != null;
+    }
+
+    public boolean existeTipo(String id) {
+        return getTipo(id) != null;
     }
 
     public Simbolo getSimbolo(String id) {
@@ -41,6 +45,23 @@ public class Tabla {
             }
         }
         return null;
+    }
+
+    public Tipo getTipo(String id) {
+        for (Tipo tipo : tablaTipos) {
+            if (tipo.getId().equals(id)) {
+                return tipo;
+            }
+        }
+        return null;
+    }
+
+    public Simbolo getSimbolo(int pos) {
+        return (Simbolo) tablaSimbolos.elementAt(pos);
+    }
+
+    public Tipo getTipo(int pos) {
+        return (Tipo) tablaTipos.elementAt(pos);
     }
 
     public void setSimbolo(Simbolo s) {

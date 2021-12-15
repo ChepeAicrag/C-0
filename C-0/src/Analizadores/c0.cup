@@ -1,65 +1,10 @@
-package Analizadores;
 
 import java_cup.runtime.*;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.*;
+import java.io.*;
 
-
-//----> PARSER CODE --
-
-parser code {:
-	static String nombreFichero;
-
-	//Inicia el parser
-	public static void main(String args[]) {
-		if (args.length != 1)
-			System.out.println("No hay programa a procesar");
-		else {
-			try {
-				Yylex lexico = new Yylex(new FileReader(args[0]));
-				nombreFichero = (String)args[0];
-				new parser(lexico).parse();
-			}
-			catch (Exception e) {
-				System.out.println("El fichero del programa no existe o no esta abierto");
-			}
-		}
-	}
-
-	// Muestra el texto de un error
-	public void report_error(String message) {
-		System.err.println(message);
-	}
-
-	// Muestra un error de sintaxis
-	public void syntax_error(Symbol actual) {
-		if (actual.sym == sym.EOF)
-			report_error("Intruccion incompleta en linea : "+InformacionCodigo.linea+
-				       " Token : "+InformacionCodigo.token);
-		else
-			report_error("Error sintactico en linea : "+InformacionCodigo.linea+
-				       " Token : "+InformacionCodigo.token);
-	}
-
-	// Muestra el texto de un error irrecuperable
-	public void report_fatal_error(String message, Object info) {
-		System.err.println(message);
-	}
-
-	// Muestra un mensaje cuando no se puede seguir analizando
-	public void unrecovered_syntax_error(Symbol actual) {
-	}
-
-	//Muestra un mensaje de error con linea, token y mensaje
-	public void error(String mensaje) {
-		report_error("ERROR -> Linea: "+InformacionCodigo.linea+" Lexema: "+InformacionCodigo.token+" "+mensaje);
-	}
-:};
-
-
-//----> ACTION CODE
- 
 action code {:
+
 	Tabla tabla;
 	int cuentaWhiles;
 	int cuentaDirecciones;
@@ -102,60 +47,6 @@ action code {:
 	void setDireccionSimbolo(String id,int dir) {
 		tabla.setDireccionSimbolo(id,dir);
 	}
-
-
-    void inicializar() 
-    {
-        tabla = new Table();
-        cuentaWhiles = 0;
-        cuentaDirecciones = 9999;
-    }
-
-
-    void setDireccionSimbolo(String id,int dir) 
-    {
-        tabla.setDireccionSimbolo(id,dir);
-    }
-
-    //CODIGO INTERMEDIO
-    //CARGAR VALOR
-    Expresion entero(String e) 
-    {
-        cuentaDirecciones++;
-        codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_VALOR", e, null, String.valueOf(cuentaDirecciones)));
-        return new Expresion(cuentaDirecciones);
-    }
-    
-    //CARGAR DIRECCION
-    Expresion identificador(String id) 
-    {
-        cuentaDirecciones++;
-        codigoIntermedio.guardarCuadrupla(new Cuadrupla("CARGAR_DIRECCION",
-        String.valueOf((tabla.getSimbolo(id)).getDireccion()), null, String.valueOf(cuentaDirecciones)));
-        return new Expresion(cuentaDirecciones);
-    }
-    
-    //SUMAR
-    Expresion suma(Expresion e1,Expresion e2) 
-    {
-	cuentaDirecciones++;
-	codigoIntermedio.guardarCuadrupla(new Cuadrupla("SUMAR",String.valueOf(e1.getDireccion()),
-								String.valueOf(e2.getDireccion()),
-								String.valueOf(cuentaDirecciones)));
-	return new Expresion(cuentaDirecciones);
-    }
-
-    //MULTIPLICAR
-    Expresion producto(Expresion e1,Expresion e2) 
-    {
-	cuentaDirecciones++;
-	codigoIntermedio.guardarCuadrupla(new Cuadrupla("MULTIPLICAR",String.valueOf(e1.getDireccion()),
-                                                                    String.valueOf(e2.getDireccion()),
-                                                                    String.valueOf(cuentaDirecciones)));
-	return new Expresion(cuentaDirecciones);
-    }
-
-    // METODOS DE LAS REGAS
 
 	Expresion suma(Expresion e1,Expresion e2) {
 		cuentaDirecciones++;
@@ -342,37 +233,65 @@ action code {:
 
 :}
 
-//----> TERMINALES
+parser code {:
 
-terminal PARENTIZQ;
-terminal PARENDER;
-terminal PUNTOCOMA;
-terminal SUMA;
-terminal RESTA;
-terminal PRODUCTO;
-terminal DIVISION;
-terminal MENOR;
-terminal MAYOR;
-terminal IGUAL;
-terminal DISTINTO;
-terminal OR;
-terminal AND;
-terminal ASIGNAR;
-terminal LLAVEIZQ;
-terminal LLAVEDER;
-terminal INT;
-terminal MAIN;
-terminal IF;
-terminal ELSE;
-terminal WHILE;
-terminal PUTS;
-terminal PUTW;
+	static String nombreFichero;
+
+	//Inicia el parser
+	public static void main(String args[]) {
+		if (args.length != 1)
+			System.out.println("No hay programa a procesar");
+		else {
+			try {
+				Yylex lexico = new Yylex(new FileReader(args[0]));
+				nombreFichero = (String)args[0];
+				new parser(lexico).parse();
+			}
+			catch (Exception e) {
+				System.out.println("El fichero del programa no existe o no esta abierto");
+			}
+		}
+	}
+
+	// Muestra el texto de un error
+	public void report_error(String message) {
+		System.err.println(message);
+	}
+
+	// Muestra un error de sintaxis
+	public void syntax_error(Symbol actual) {
+		if (actual.sym == sym.EOF)
+			report_error("Intruccion incompleta en linea : "+InformacionCodigo.linea+
+				       " Token : "+InformacionCodigo.token);
+		else
+			report_error("Error sintactico en linea : "+InformacionCodigo.linea+
+				       " Token : "+InformacionCodigo.token);
+	}
+
+	// Muestra el texto de un error irrecuperable
+	public void report_fatal_error(String message, Object info) {
+		System.err.println(message);
+	}
+
+	// Muestra un mensaje cuando no se puede seguir analizando
+	public void unrecovered_syntax_error(Symbol actual) {
+	}
+
+	//Muestra un mensaje de error con linea, token y mensaje
+	public void error(String mensaje) {
+		report_error("ERROR -> Linea: "+InformacionCodigo.linea+" Lexema: "+InformacionCodigo.token+" "+mensaje);
+	}
+:}
+
+//Terminales
+terminal PARENTIZQ, PARENDER, PUNTOCOMA, SUMA, RESTA, PRODUCTO, DIVISION, MENOR, MAYOR, IGUAL, DISTINTO; 
+terminal OR, AND, ASIGNAR, LLAVEDER, RLLAVE, INT, MAIN, IF, ELSE, WHILE, PUTS, PUTW; 
 terminal BREAK;
-terminal String CADENATEXTO;
 terminal String ID;
 terminal String ENTERO;
+terminal String CADENATEXTO;
 
-//----> NO TERMINALES
+// No terminales
 non terminal Programa, Declaraciones, Cuerpo;
 non terminal Declaracion;
 non terminal BloqueSentencias;
@@ -385,41 +304,93 @@ non terminal SentAsignacion;
 non terminal SentPutw, SentPuts;
 non terminal SentBreak;
 
-//------>PRECEDENCIA
+//Precedencias de los operadores
 precedence left ASIGNAR;
 precedence left OR, AND;
-precedence left DISTINTO, IGUAL, MAYOR, MENOR;
+precedence left IGUAL, DISTINTO, MAYOR, MENOR;     
 precedence left SUMA, RESTA;
-precedence right PRODUCTO, DIVISION;
-precedence right PARENTIZQ, PARENDER;
+precedence left PRODUCTO, DIVISION;
+precedence left PARENTIZQ, PARENDER;
+precedence left ELSE;
+
+//Comienza con un no terminal
 
 start with Programa;
 
-//Semantico
+//Aqui va la gramatica
 
 Programa ::= {:
-
-		inicializar();
-            :}
-Declaraciones Cuerpo | Cuerpo;
+			inicializar();
+		 :}
+		 Declaraciones Cuerpo | Cuerpo;
 
 Declaraciones ::= Declaraciones Declaracion | Declaracion;
 
-Declaracion ::= INT ID:id PUNTOCOMA 
-    {:
-        if(existeSimbolo(id)) 
-        {
-            parser.error(Textos.simboloRedeclarado);
-        } 
-        else 
-        {
-            addSimbolo(id);
-            cuentaDirecciones++;
-            setDireccionSimbolo(id,cuentaDirecciones);
-        }
-    :}
-    ;
+Declaracion ::= INT ID:id PUNTOCOMA
+			{:
+				if(existeSimbolo(id)) {
+					parser.error(Textos.simboloRedeclarado);
+				} else {
+					addSimbolo(id);
+					cuentaDirecciones++;
+					setDireccionSimbolo(id,cuentaDirecciones);
+				}
+			:}
+		    ;
 
+Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEDER BloqueSentencias 
+			{: 
+				finPrograma();
+				generarCadenas();
+				cerrarCI(); 
+				generarCF();
+			:}
+	     RLLAVE;
+
+BloqueSentencias ::= Sentencias |;
+
+Sentencias ::= Sentencias Sentencia | Sentencia;
+
+Expresion ::= Expresion:e1 SUMA Expresion:e2 
+			{:
+				RESULT=suma(e1,e2);
+			:}
+              |
+		  Expresion:e1 RESTA Expresion:e2 
+			{:
+				RESULT=resta(e1,e2);
+			:}
+		  |
+              Expresion:e1 PRODUCTO Expresion:e2 
+			{:
+				RESULT=producto(e1,e2);
+			:}
+		  |
+		  Expresion:e1 DIVISION Expresion:e2 
+			{:
+				RESULT=division(e1,e2);
+			:}
+		  |
+		  ENTERO:e 
+			{:
+				RESULT=entero(e);
+			:}
+		  |
+		  ID:id 
+			{:
+				if(existeSimbolo(id)) {
+					RESULT=identificador(id);
+				} else {
+					parser.error(Textos.simboloNoDeclarado);
+					RESULT=identificador(null);
+				}
+			:}
+		  |
+	   	  PARENTIZQ Expresion:e PARENDER 
+			{:
+				RESULT=e;
+			:}
+		  ;
 
 Condicion ::= Condicion:c1 OR Condicion:c2 
 			{:
@@ -457,110 +428,16 @@ Condicion ::= Condicion:c1 OR Condicion:c2
 			:}
               ;
 
-Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias
-			{:
-				finPrograma();
-				generarCadenas();
-				cerrarCI();
-				generarCF();
-			:}
-	     LLAVEDER;
-
-BloqueSentencias ::= Sentencias |;
-
-Sentencias ::= Sentencias Sentencia | Sentencia;
-
-//---->Reglas de evaluación de expresiones
-
-    Expresion ::= Expresion:e1 SUMA Expresion:e2 
-
-			{:
-				RESULT=suma(e1,e2);
-			:}
-      |
-		  Expresion:e1 RESTA Expresion:e2 
-			{:
-				RESULT=resta(e1,e2);
-			:}
-		  |
-        Expresion:e1 PRODUCTO Expresion:e2 
-			{:
-				RESULT=producto(e1,e2);
-			:}
-		  |
-		  Expresion:e1 DIVISION Expresion:e2 
-			{:
-				RESULT=division(e1,e2);
-			:}
-		  |
-		  ENTERO:e 
-			{:
-				RESULT=entero(e);
-			:}
-		  |
-		  ID:id 
-			{:
-				if(existeSimbolo(id)) {
-					RESULT=identificador(id);
-				} else {
-					parser.error(Textos.simboloNoDeclarado);
-					RESULT=identificador(null);
-				}
-			:}
-		  |
-	   	  PARENTIZQ Expresion:e PARENDER
-			{:
-				RESULT=e;
-			:}
-		  ;
-
-//-------->CONDICIONES
-Condicion ::= Condicion:c1 OR Condicion:c2 
-			{:
-				RESULT=or(c1,c2);
-			:}
-	    |
-		  Condicion:c1 AND Condicion:c2 
-			{:
-				RESULT=and(c1,c2);
-			:}
-		  |
-      	Expresion:e1 IGUAL Expresion:e2 
-			{:
-				RESULT=igual(e1,e2);
-			:}
-		  |
-		  Expresion:e1 DISTINTO Expresion:e2 
-			{:
-				RESULT=distinto(e1,e2);
-			:}
-		  |
-		  Expresion:e1 MAYOR Expresion:e2 
-			{:
-				RESULT=mayor(e1,e2);
-			:}
-		  |
-		  Expresion:e1 MENOR Expresion:e2 
-			{:
-				RESULT=menor(e1,e2);
-			:}
-		  |
-		  PARENTIZQ Condicion:c PARENDER
-      {:
-				RESULT=c;
-			:}
-              ;
-              
-SentIf ::= IF PARENTIZQ
+SentIf ::= IF PARENTIZQ 
 			{:
 				cuentaIf++;
 				pilaIf.apilar(cuentaIf);
 			:}
-           Condicion:c
+           Condicion:c 
 			{:
 				condicion(c,pilaIf.verCima());
 			:}
-	     PARENDER LLAVEIZQ BloqueSentencias LLAVEDER
+	     PARENDER LLAVEDER BloqueSentencias RLLAVE 
 			{:
 				saltarEtiqueta("FINIF",pilaIf.verCima());
 				ponerEtiqueta("ELSE",pilaIf.verCima());
@@ -572,9 +449,9 @@ SentIf ::= IF PARENTIZQ
 			:}
            ;
 
-SentElse ::= ELSE LLAVEIZQ BloqueSentencias LLAVEDER |;
+SentElse ::= ELSE LLAVEDER BloqueSentencias RLLAVE |;
 
-SentWhile ::= WHILE PARENTIZQ
+SentWhile ::= WHILE PARENTIZQ 
 			{:
 				cuentaBucle++;
 				pilaBucle.apilar(cuentaBucle);
@@ -583,16 +460,16 @@ SentWhile ::= WHILE PARENTIZQ
 		  Condicion:c
 			{:
 				condicion2(c,pilaBucle.verCima());
-			:}
-		  PARENDER LLAVEIZQ
+			:} 
+		  PARENDER LLAVEDER 
 			{:
 				cuentaWhiles++;
 			:}
-		  BloqueSentencias
+		  BloqueSentencias 
 			{:
 				cuentaWhiles--;
 			:}
-		  LLAVEDER
+		  RLLAVE
 			{:
 				saltarEtiqueta("BUCLE",pilaBucle.verCima());
 				ponerEtiqueta("FINBUCLE",pilaBucle.verCima());
@@ -601,19 +478,19 @@ SentWhile ::= WHILE PARENTIZQ
 		  ;
 
 SentAsignacion ::= ID:id
-			{:
-			if(existeSimbolo(id)) {
-			} else {
-				parser.error(Textos.simboloNoDeclarado);
-			}
-			:}
-		 ASIGNAR Expresion:e PUNTOCOMA
-			{:
-				asignacion(id,e);
-			:}
-	         ;
+				{:
+					if(existeSimbolo(id)) {
+					} else {
+						parser.error(Textos.simboloNoDeclarado);
+					}
+				:} 
+			 ASIGNAR Expresion:e PUNTOCOMA
+				{:
+					asignacion(id,e);
+				:}
+                   ;
 
-SentPutw ::= PUTW PARENTIZQ Expresion:e
+SentPutw ::= PUTW PARENTIZQ Expresion:e 
 			{:
 				imprimirW(e);
 			:}
@@ -626,12 +503,12 @@ SentPuts ::= PUTS PARENTIZQ CADENATEXTO:c
 			:}
 	       PARENDER PUNTOCOMA;
 
-SentBreak ::= BREAK
+SentBreak ::= BREAK 
 			{:
-			if(cuentaWhiles>0) {
-			} else {
-				parser.error(Textos.breakSinWhile);
-			}
+				if(cuentaWhiles>0) {
+				} else {
+					parser.error(Textos.breakSinWhile);
+				}
 			:}
 		  PUNTOCOMA;
 
