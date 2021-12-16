@@ -1,32 +1,54 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Analizadores;
 
-import java.io.IOException;
+import java.io.*;
+import java.util.*;
 
-/**
- *
- * @author lucy_
- */
-public class CodigoIntermedio {
+class CodigoIntermedio {
 
-    CodigoIntermedio(String string) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    String nombreFichero = null;
+    PrintWriter ficheroEscritura;
+    BufferedReader ficheroLectura;
+    Vector instrucciones;
+
+    public CodigoIntermedio(String nombre) {
+        nombreFichero = nombre;
+        ficheroLectura = null;
+        ficheroEscritura = null;
+        crearInstrucciones();
     }
 
-    void abrirFicheroEscritura() throws IOException{
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void crearInstrucciones() {
+        instrucciones = new Vector();
     }
 
-    void cerrarFicheroEscritura() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void abrirFicheroLectura() throws IOException {
+        ficheroLectura = new BufferedReader(
+                new FileReader(nombreFichero));
     }
 
-    void guardarCuadrupla(Cuadrupla cuadrupla) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void cerrarFicheroLectura() throws IOException {
+        ficheroLectura.close();
     }
-    
+
+    public void abrirFicheroEscritura() throws IOException {
+        ficheroEscritura = new PrintWriter(
+                new BufferedWriter(
+                        new FileWriter(nombreFichero)));
+    }
+
+    public void cerrarFicheroEscritura() {
+        Cuadrupla cuadrupla;
+        for (int i = 0; i < instrucciones.size(); i++) {
+            cuadrupla = (Cuadrupla) instrucciones.elementAt(i);
+            ficheroEscritura.println(cuadrupla.getNombre()
+                    + " " + cuadrupla.getOp1()
+                    + " " + cuadrupla.getOp2()
+                    + " " + cuadrupla.getRes());
+        }
+        ficheroEscritura.close();
+    }
+
+    public void guardarCuadrupla(Cuadrupla cuadrupla) {
+        instrucciones.addElement(cuadrupla);
+    }
 }

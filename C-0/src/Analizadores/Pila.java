@@ -5,22 +5,31 @@
  */
 package Analizadores;
 
+import java.util.Vector;
+
 /**
  *
  * @author lucy_
  */
 class Pila {
 
-    void apilar(int cuentaBucle) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    Vector pila;
+
+    Pila() {
+        pila = new Vector();
+    }
+
+    void apilar(int n) {
+        pila.addElement(new Integer(n));
+    }
+
+    int desapilar() {
+        int retorno = ((Integer) pila.lastElement()).intValue();
+        pila.removeElementAt(pila.size() - 1);
+        return retorno;
     }
 
     int verCima() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return ((Integer) pila.lastElement()).intValue();
     }
-
-    void desapilar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
 }

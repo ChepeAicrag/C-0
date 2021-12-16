@@ -26,7 +26,7 @@ public class Test {
                 codFuente = name.substring(0, name.lastIndexOf("."));
                 new parser(lexico).parse();
             } catch (FileNotFoundException e1) {
-                //System.out.println(e1);
+                System.out.println(e1);
             }
         }
     }

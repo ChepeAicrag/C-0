@@ -5,22 +5,29 @@
  */
 package Analizadores;
 
+import java.util.Vector;
+
 /**
  *
  * @author lucy_
  */
 class Lista {
 
-    void addCadena(String c) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    Vector lista;
+
+    Lista() {
+        lista = new Vector();
     }
 
-    int size() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    void addCadena(String c) {
+        lista.addElement(c);
     }
 
     String getCadena(int i) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return (String) lista.elementAt(i);
     }
-    
+
+    int size() {
+        return lista.size();
+    }
 }

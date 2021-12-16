@@ -1,14 +1,33 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Analizadores;
 
-/**
- *
- * @author lucy_
- */
 public class Tipo {
-    
+
+    private int cod;
+    private String id;
+
+    Tipo() {
+        cod = -1;
+        id = "";
+    }
+
+    Tipo(int c, String i) {
+        cod = c;
+        id = i;
+    }
+
+    void setCod(int c) {
+        cod = c;
+    }
+
+    void setId(String i) {
+        id = i;
+    }
+
+    int getCod() {
+        return cod;
+    }
+
+    String getId() {
+        return id;
+    }
 }
