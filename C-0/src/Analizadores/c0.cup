@@ -285,7 +285,7 @@ parser code {:
 
 //Terminales
 terminal PARENTIZQ, PARENDER, PUNTOCOMA, SUMA, RESTA, PRODUCTO, DIVISION, MENOR, MAYOR, IGUAL, DISTINTO; 
-terminal OR, AND, ASIGNAR, LLAVEDER, RLLAVE, INT, MAIN, IF, ELSE, WHILE, PUTS, PUTW; 
+terminal OR, AND, ASIGNAR, LLAVEIZQ, LLAVEDER, INT, MAIN, IF, ELSE, WHILE, PUTS, PUTW; 
 terminal BREAK;
 terminal String ID;
 terminal String ENTERO;
@@ -338,14 +338,14 @@ Declaracion ::= INT ID:id PUNTOCOMA
 			:}
 		    ;
 
-Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEDER BloqueSentencias 
+Cuerpo ::= MAIN PARENTIZQ PARENDER LLAVEIZQ BloqueSentencias 
 			{: 
 				finPrograma();
 				generarCadenas();
 				cerrarCI(); 
 				generarCF();
 			:}
-	     RLLAVE;
+	     LLAVEDER;
 
 BloqueSentencias ::= Sentencias |;
 
@@ -437,7 +437,7 @@ SentIf ::= IF PARENTIZQ
 			{:
 				condicion(c,pilaIf.verCima());
 			:}
-	     PARENDER LLAVEDER BloqueSentencias RLLAVE 
+	     PARENDER LLAVEIZQ BloqueSentencias LLAVEDER 
 			{:
 				saltarEtiqueta("FINIF",pilaIf.verCima());
 				ponerEtiqueta("ELSE",pilaIf.verCima());
@@ -449,7 +449,7 @@ SentIf ::= IF PARENTIZQ
 			:}
            ;
 
-SentElse ::= ELSE LLAVEDER BloqueSentencias RLLAVE |;
+SentElse ::= ELSE LLAVEIZQ BloqueSentencias LLAVEDER |;
 
 SentWhile ::= WHILE PARENTIZQ 
 			{:
@@ -461,7 +461,7 @@ SentWhile ::= WHILE PARENTIZQ
 			{:
 				condicion2(c,pilaBucle.verCima());
 			:} 
-		  PARENDER LLAVEDER 
+		  PARENDER LLAVEIZQ 
 			{:
 				cuentaWhiles++;
 			:}
@@ -469,7 +469,7 @@ SentWhile ::= WHILE PARENTIZQ
 			{:
 				cuentaWhiles--;
 			:}
-		  RLLAVE
+		  LLAVEDER
 			{:
 				saltarEtiqueta("BUCLE",pilaBucle.verCima());
 				ponerEtiqueta("FINBUCLE",pilaBucle.verCima());

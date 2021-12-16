@@ -23,11 +23,13 @@ public class Tabla {
     }
 
     public void addSimbolo(String id) {
-        tablaSimbolos.add(new Simbolo(tablaSimbolos.size(), id));
+        int x = tablaSimbolos.size();
+        tablaSimbolos.add(new Simbolo(x, id));
     }
 
     public void addTipo(String id) {
-        tablaTipos.add(new Tipo(tablaTipos.size(), id));
+        int x = tablaTipos.size();
+        tablaTipos.add(new Tipo(x, id));
     }
 
     public boolean existeSimbolo(String id) {

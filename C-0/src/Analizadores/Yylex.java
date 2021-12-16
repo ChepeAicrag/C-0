@@ -2,7 +2,6 @@
 
 package Analizadores;
 import java_cup.runtime.Symbol;  
-import java.lang.System;
 import java.io.*;
 
 

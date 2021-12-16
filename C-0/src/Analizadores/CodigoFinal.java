@@ -10,9 +10,14 @@ package Analizadores;
  * @author lucy_
  */
 class CodigoFinal {
-
+    
+    CodigoIntermedio ci; 
+    String nombreFichero;
+    
     CodigoFinal(CodigoIntermedio codigoIntermedio, String nombreFichero) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ci = codigoIntermedio;
+        this.nombreFichero = nombreFichero;
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     void traducirCodigo() {
