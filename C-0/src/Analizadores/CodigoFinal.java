@@ -5,23 +5,127 @@
  */
 package Analizadores;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+
 /**
  *
- * @author lucy_
+ * @author mende
  */
-class CodigoFinal {
-    
-    CodigoIntermedio ci; 
-    String nombreFichero;
-    
-    CodigoFinal(CodigoIntermedio codigoIntermedio, String nombreFichero) {
-        ci = codigoIntermedio;
-        this.nombreFichero = nombreFichero;
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+public class CodigoFinal {
+
+    private CodigoIntermedio codigoIntermedio;
+    private PrintWriter fichero;
+    private String archivoCF;
+
+    public CodigoFinal(CodigoIntermedio CI, String nombreDelPrograma) {
+        codigoIntermedio = CI;
+        String nombreNuevo = nombreDelPrograma.substring(0, nombreDelPrograma.lastIndexOf("."));
+        archivoCF = nombreNuevo.concat(".ens");
     }
 
-    void traducirCodigo() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void abrirFichero() throws IOException {
+        fichero = new PrintWriter(
+                new BufferedWriter(
+                        new FileWriter(archivoCF)));
     }
-    
+
+    private void cerrarFichero() {
+        fichero.close();
+    }
+
+    private void escribirLinea(String linea) {
+        fichero.println(linea);
+    }
+
+    private void lineaBlanco() {
+        fichero.println("");
+    }
+
+    public void traducirCodigo() throws IOException {
+		Cuadrupla cuadrupla;
+		abrirFichero();
+		for(int i=0;i<codigoIntermedio.instrucciones.size();i++) {
+			cuadrupla=(Cuadrupla)codigoIntermedio.instrucciones.elementAt(i);
+			procesarCuadrupla(cuadrupla);
+		}
+		cerrarFichero();
+	}
+
+    private void procesarCuadrupla(Cuadrupla cuadrupla) throws IOException {
+        String op1, op2, inst, res;
+        String linea = " ";
+        op1 = cuadrupla.op1;
+        op2 = cuadrupla.op2;
+        inst = cuadrupla.nombre;
+        res = cuadrupla.res;
+        if (inst.equals("CARGAR_DIRECCION")) {
+            escribirLinea(linea + "MOVE /" + op1 + " , /" + res);
+        } else if (inst.equals("CARGAR_VALOR")) {
+            escribirLinea(linea + "MOVE #" + op1 + " , /" + res);
+        } else if (inst.equals("SUMAR")) {
+            escribirLinea(linea + "ADD /" + op1 + " , /" + op2);
+            escribirLinea(linea + "MOVE .A , /" + res);
+        } else if (inst.equals("RESTAR")) {
+            escribirLinea(linea + "SUB /" + op1 + " , /" + op2);
+            escribirLinea(linea + "MOVE .A , /" + res);
+        } else if (inst.equals("MULTIPLICAR")) {
+            escribirLinea(linea + "MUL /" + op1 + " , /" + op2);
+            escribirLinea(linea + "MOVE .A , /" + res);
+        } else if (inst.equals("DIVIDIR")) {
+            escribirLinea(linea + "DIV /" + op1 + " , /" + op2);
+            escribirLinea(linea + "MOVE .A , /" + res);
+        } else if (inst.equals("OR")) {
+            escribirLinea(linea + "OR /" + op1 + " , /" + op2);
+            escribirLinea(linea + "MOVE .A , /" + res);
+        } else if (inst.equals("AND")) {
+            escribirLinea(linea + "AND /" + op1 + " , /" + op2);
+            escribirLinea(linea + "MOVE .A , /" + res);
+        } else if (inst.equals("MAYOR")) {
+            escribirLinea(linea + "CMP /" + op2 + " , /" + op1);
+            escribirLinea(linea + "BN $5");
+            escribirLinea(linea + "MOVE #0 , /" + res);
+            escribirLinea(linea + "BR $3");
+            escribirLinea(linea + "MOVE #1 , /" + res);
+        } else if (inst.equals("MENOR")) {
+            escribirLinea(linea + "CMP /" + op1 + " , /" + op2);
+            escribirLinea(linea + "BN $5");
+            escribirLinea(linea + "MOVE #0 , /" + res);
+            escribirLinea(linea + "BR $3");
+            escribirLinea(linea + "MOVE #1 , /" + res);
+        } else if (inst.equals("IGUAL")) {
+            escribirLinea(linea + "CMP /" + op1 + " , /" + op2);
+            escribirLinea(linea + "BZ $5");
+            escribirLinea(linea + "MOVE #0 , /" + res);
+            escribirLinea(linea + "BR $3");
+            escribirLinea(linea + "MOVE #1 , /" + res);
+        } else if (inst.equals("DISTINTO")) {
+            escribirLinea(linea + "CMP /" + op1 + " , /" + op2);
+            escribirLinea(linea + "BZ $5");
+            escribirLinea(linea + "MOVE #1 , /" + res);
+            escribirLinea(linea + "BR $3");
+            escribirLinea(linea + "MOVE #0 , /" + res);
+        } else if (inst.equals("ETIQUETA")) {
+            String lin = res + ":" + linea;
+            System.out.println(lin);
+            escribirLinea(lin.substring(0, lin.length()) + "NOP");
+        } else if (inst.equals("SALTAR_CONDICION")) {
+            escribirLinea(linea + "CMP #0 , /" + op1);
+            escribirLinea(linea + "BZ /" + res);
+        } else if (inst.equals("SALTAR_ETIQUETA")) {
+            escribirLinea(linea + "BR /" + res);
+        } else if (inst.equals("IMPRIMIR_ENTERO")) {
+            escribirLinea(linea + "WRINT /" + op1);
+        } else if (inst.equals("IMPRIMIR_CADENA")) {
+            escribirLinea(linea + "WRSTR /" + op1);
+        } else if (inst.equals("PONER_CADENA")) {
+            String lin = op1 + ": DATA" + linea;
+            escribirLinea(lin.substring(0, lin.length()) + res);
+        } else if (inst.equals("FIN")) {
+            escribirLinea(linea + "HALT");
+        }
+    }
 }
