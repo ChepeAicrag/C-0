@@ -5,7 +5,7 @@ ____
 En este repositorio se encuentra el proyecto desarrollado por el equipo 1. Dicho equipo es conformado por los equipos:
 
 ## Equipo A
-Este equipo desarrolló la parte de las precedencias que se encuentran en el analizador sintáctico. 
+Este equipo desarrolló la parte de las precedencias que se encuentran en el analizador sintáctico. El código aportado se encuentra en la rama *precendecias*
 
 Los integrantes de este equipo son:
 
@@ -14,7 +14,7 @@ Los integrantes de este equipo son:
 - Alfredo Martín Espinoza Girón
 
 ## Equipo B
-Este equipo desarrolló la parte del analizador léxico y la parte inicial del analizador sintáctico.
+Este equipo desarrolló la parte del analizador léxico y la parte inicial del analizador sintáctico. El código aportado se encuentra en la rama *general*
 
 Los integrantes de este equipo son:
 
@@ -23,7 +23,7 @@ Los integrantes de este equipo son:
 - Denisse Stephanie Rosado Enriquez
 
 ## Equipo C
-Este equipo desarrolló la parte del código intermedio.
+Este equipo desarrolló la parte del código intermedio. El código aportado se encuentra en la rama *codigo-intermedio*
 
 Los integrantes de este equipo son:
 
@@ -32,7 +32,7 @@ Los integrantes de este equipo son:
 - Britany Jasive Santiago Cruz
 
 ## Equipo G
-Este equipo desarrolló la parte del action code que se encuentra en el analizador sintáctico. 
+Este equipo desarrolló la parte del action code que se encuentra en el analizador sintáctico. El código aportado se encuentra en la rama *general*
 
 Los integrantes de este equipo son:
 
