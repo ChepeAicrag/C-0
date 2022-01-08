@@ -5,12 +5,15 @@
  */
 package Analizadores;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+
 
 /**
  *
- * @author mend
+ * @author mende
  */
 public class CodigoFinal {
 
@@ -54,7 +57,7 @@ public class CodigoFinal {
 
     private void procesarCuadrupla(Cuadrupla cuadrupla) throws IOException {
         String op1, op2, inst, res;
-        String linea = "                                        ";
+        String linea = " ";
         op1 = cuadrupla.op1;
         op2 = cuadrupla.op2;
         inst = cuadrupla.nombre;
@@ -107,7 +110,8 @@ public class CodigoFinal {
             escribirLinea(linea + "MOVE #0 , /" + res);
         } else if (inst.equals("ETIQUETA")) {
             String lin = res + ":" + linea;
-            escribirLinea(lin.substring(0, linea.length()) + "NOP");
+            System.out.println(lin);
+            escribirLinea(lin.substring(0, lin.length()) + "NOP");
         } else if (inst.equals("SALTAR_CONDICION")) {
             escribirLinea(linea + "CMP #0 , /" + op1);
             escribirLinea(linea + "BZ /" + res);
@@ -119,7 +123,7 @@ public class CodigoFinal {
             escribirLinea(linea + "WRSTR /" + op1);
         } else if (inst.equals("PONER_CADENA")) {
             String lin = op1 + ": DATA" + linea;
-            escribirLinea(lin.substring(0, linea.length()) + res);
+            escribirLinea(lin.substring(0, lin.length()) + res);
         } else if (inst.equals("FIN")) {
             escribirLinea(linea + "HALT");
         }
