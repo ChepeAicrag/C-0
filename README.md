@@ -32,7 +32,7 @@ Los integrantes de este equipo son:
 - Britany Jasive Santiago Cruz
 
 ## Equipo G
-Este equipo desarrolló la parte del action code que se encuentra en el analizador sintáctico. El código aportado se encuentra en la rama *general*
+Este equipo desarrolló la parte del action code que se encuentra en el analizador sintáctico. El código aportado se encuentra en la rama *action-code*
 
 Los integrantes de este equipo son:
 
