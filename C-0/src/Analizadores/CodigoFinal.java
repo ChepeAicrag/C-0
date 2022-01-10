@@ -110,7 +110,6 @@ public class CodigoFinal {
             escribirLinea(linea + "MOVE #0 , /" + res);
         } else if (inst.equals("ETIQUETA")) {
             String lin = res + ":" + linea;
-            System.out.println(lin);
             escribirLinea(lin.substring(0, lin.length()) + "NOP");
         } else if (inst.equals("SALTAR_CONDICION")) {
             escribirLinea(linea + "CMP #0 , /" + op1);
