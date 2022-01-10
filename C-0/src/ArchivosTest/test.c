@@ -1,18 +1,34 @@
-int x;
-int y;
-main() {
-    x=1-12;
-    y=x*32;
-    x=(32/12)*y;
-    if(x>7) {
-        while(y>0) {
-            y=y-1;
-            if(y>1) {
-                break;
-            }
+int m;
+int i;
+int es;
+int l;
+int n;
+
+main(){
+    m = 10;
+    i = 1;
+    while(i <  m || i == m){ 
+        es = m - i;
+        while (es > 0){       
+            puts(" "); 
+            es = es - 1;
         }
+        l = 1;
+        while (l < (2 * i)){ 
+            puts("*");
+            l = l + 1;
+        }
+        puts(" \n"); 
+        i = i + 1;
     }
-puts("Cadena\n");
-puts("de texto");
-putw(x+y);
+    i = 1;
+    while(i < m || i == m){
+        es = 1;
+        while (es < m - 1 || es == m - 1){       
+            puts(" "); 
+            es = es + 1;
+        }
+        puts("*\n"); 
+        i = i + 1;
+    }
 }
