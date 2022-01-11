@@ -39,3 +39,5 @@ Los integrantes de este equipo son:
 - Gómez Suárez Julián Enrique
 - Jiménez Rosas Juan José
 - López Canseco Ricardo Ariel
+
+Las ramas *test* fue utilizada para realizar diferentes pruebas durante el desarrollo. Y la rama *fixes* fue implementanda para solucionar los problemas encontrados durante las pruebas.
